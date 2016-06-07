@@ -13,9 +13,8 @@ class checker:
         self.__debug     = args.debug
         self.__title     = args.log_title
 
-        self.__out_msg   = 'OK: Last s3 sync %s'
-        self.out_msg     = ''
-        self.out_status  = 0
+        self.out_msg     = 'NOK: no up-to-date s3sync found'
+        self.out_status  = 2
 
         self.__logs      = ['syslog', 'syslog.1']
 
@@ -26,8 +25,9 @@ class checker:
             print string
 
     def __find_log(self):
-        reg = re.compile('(?P<month>[A-z]{3})\s+(?P<day>[0-9]{1,2}) (?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2}) \w+ %s: success' % self.__title)
-        year = datetime.now().year
+        reg  = re.compile('(?P<month>[A-z]{3})\s+(?P<day>[0-9]{1,2}) (?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2}) \w+ %s: success' % self.__title)
+        now  = datetime.now()
+        year = now.year
         for log in self.__logs:
             self.__print('Testing %s' % os.path.join('/var/log', log))
             f = open(os.path.join('/var/log', log), 'r').read()
@@ -36,9 +36,9 @@ class checker:
                 date_str = '%i %s %s %s' % (year, m.group('month'), m.group('day').zfill(2), m.group('time'))
                 last = datetime.strptime(date_str, '%Y %b %d %H:%M:%S')
                 self.__print('Found: %s' % last)
-                if datetime.now() - timedelta(hours = self.__threshold) < last:
+                if last.date() == now.date() or now.hour < self.__threshold and last.date() == (now - timedelta(days=1)).date():
                     self.__print('Threshold is met')
-                    self.out_msg = self.__out_msg % last
+                    self.out_msg = 'OK: last s3 pull %s' % last
 
 
 
