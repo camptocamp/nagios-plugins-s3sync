@@ -39,6 +39,7 @@ class checker:
                 if last.date() == now.date() or now.hour < self.__threshold and last.date() == (now - timedelta(days=1)).date():
                     self.__print('Threshold is met')
                     self.out_msg = 'OK: last s3 pull %s' % last
+                    self.out_status  = 0
 
 
 
