@@ -31,15 +31,16 @@ class checker:
         for log in self.__logs:
             self.__print('Testing %s' % os.path.join('/var/log', log))
             f = open(os.path.join('/var/log', log), 'r').read()
-            m = reg.search(f)
-            if m:
-                date_str = '%i %s %s %s' % (year, m.group('month'), m.group('day').zfill(2), m.group('time'))
-                last = datetime.strptime(date_str, '%Y %b %d %H:%M:%S')
-                self.__print('Found: %s' % last)
-                if last.date() == now.date() or now.hour < self.__threshold and last.date() == (now - timedelta(days=1)).date():
-                    self.__print('Threshold is met')
-                    self.out_msg = 'OK: last s3 pull %s' % last
-                    self.out_status  = 0
+            matchers = reg.findall(f)
+            if matchers and len(matchers) > 0:
+                for m in matchers:
+                    date_str = '%i %s %s %s' % (year, m[0], m[1].zfill(2), m[2])
+                    last = datetime.strptime(date_str, '%Y %b %d %H:%M:%S')
+                    self.__print('Found: %s' % last)
+                    if last.date() == now.date() or now.hour < self.__threshold and last.date() == (now - timedelta(days=1)).date():
+                        self.__print('Threshold is met')
+                        self.out_msg = 'OK: last s3 pull %s' % last
+                        self.out_status  = 0
 
 
 
