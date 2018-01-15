@@ -16,7 +16,12 @@ class checker:
         self.out_msg     = 'NOK: no up-to-date s3sync found'
         self.out_status  = 2
 
-        self.__logs      = ['syslog', 'syslog.1']
+        self.__logs      = [
+                'syslog',
+                'messages',
+                'syslog.1',
+                'messages.1',
+                ]
 
         self.__find_log()
 
